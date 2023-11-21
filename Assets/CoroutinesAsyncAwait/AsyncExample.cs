@@ -10,10 +10,11 @@ namespace CoroutinesAsyncAwait
     
     public class AsyncExample : MonoBehaviour
     {
+        public GameObject Cube;
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        private async void Start()
+        private void Start()
         {
             CancellationToken cancelToken = _cancellationTokenSource.Token;
             
@@ -23,7 +24,7 @@ namespace CoroutinesAsyncAwait
                 _cancellationTokenSource.Cancel();
             });
             
-            Task.Run(() => PrintForever(cancelToken, 10));
+            // Task.Run(() => PrintForever(cancelToken, 10));
 
             // PrintAsync();
             // await Task.Run(() => SomeAction());
@@ -34,12 +35,26 @@ namespace CoroutinesAsyncAwait
             // var taskResult = await Task.WhenAny(task1, task2);
             // Debug.Log($"FASTEST [{taskResult.Result}]");
 
-            Task task = new Task(() => FactorialAsync(cancelToken, 5));
-            task.Start();
+            // Task task = new Task(() => FactorialAsync(cancelToken, 5));
+            // task.Start();
             
             // _cancellationTokenSource.
-
+            Task.Run(async () => await Rotate(cancelToken));
+            // Rotate(cancelToken);
         }
+
+
+        private async Task Rotate(CancellationToken ct)
+        {
+            while (true)
+            {
+                if (ct.IsCancellationRequested) return;
+                
+                Cube.transform.position += Vector3.one;
+                await Task.Delay(500);
+            }
+        }
+        
 
 
         private async Task<long> FactorialAsync(CancellationToken cancelToken, int x)
