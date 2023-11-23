@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Jobs;
 using Unity.Jobs;
 using Unity.Burst;
+using Unity.VisualScripting;
 using Random = UnityEngine.Random;
 
 
@@ -24,8 +25,16 @@ namespace JobsSystem
         private NativeArray<int> angle;
         private TransformAccessArray accessArray;
         private Material[] cubesu;
-        
-        
+
+        private MaterialPropertyBlock materialBlock;
+
+
+        private void Awake()
+        {
+            materialBlock = new MaterialPropertyBlock();
+        }
+
+
         private void Start()
         {
             cubesu = new Material[count];
@@ -75,6 +84,7 @@ namespace JobsSystem
             {
                 objects[i] = Instantiate(prefab).transform;
                 cubesu[i] = objects[i].gameObject.GetComponent<MeshRenderer>().material;
+                objects[i].gameObject.GetComponent<MeshRenderer>().SetPropertyBlock(materialBlock);
                 objects[i].position = Random.insideUnitSphere * spawnRadius;
             }
 
