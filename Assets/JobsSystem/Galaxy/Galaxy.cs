@@ -25,6 +25,7 @@ namespace JobsSystem.Galaxy
         private NativeArray<Vector3> velocities;
         private NativeArray<Vector3> accelerations;
         private NativeArray<float> masses;
+        private NativeArray<int> angles;
 
         private TransformAccessArray transformAccessArray;
 
@@ -35,6 +36,7 @@ namespace JobsSystem.Galaxy
             velocities = new NativeArray<Vector3>(numberOfEntities, Allocator.Persistent);
             accelerations = new NativeArray<Vector3>(numberOfEntities, Allocator.Persistent);
             masses = new NativeArray<float>(numberOfEntities, Allocator.Persistent);
+            angles = new NativeArray<int>(numberOfEntities, Allocator.Persistent);
             
             Transform[] transforms = new Transform[numberOfEntities];
             
@@ -63,9 +65,10 @@ namespace JobsSystem.Galaxy
                 GravitationModifier = this.gravitationModifier,
                 DeltaTime = Time.deltaTime
             };
-
+            
             JobHandle gravitationJobHandle = gravitationJob.Schedule(numberOfEntities, 0);
 
+            
             MoveJob moveJob = new MoveJob()
             {
                 Positions = positions,
@@ -76,11 +79,20 @@ namespace JobsSystem.Galaxy
 
             JobHandle moveJobHandle = moveJob.Schedule(transformAccessArray, gravitationJobHandle);
             moveJobHandle.Complete();
+
+            
+            RotateJob rotateJob = new RotateJob()
+            {
+                Angles = angles
+            };
+
+            JobHandle rotateHandle = rotateJob.Schedule(transformAccessArray);
+            rotateHandle.Complete();
         }
 
 
         [BurstCompile]
-        public struct GravitationJob : IJobParallelFor
+        private struct GravitationJob : IJobParallelFor
         {
             [ReadOnly] public NativeArray<Vector3> Positions;
             [ReadOnly] public NativeArray<Vector3> Velocities;
@@ -112,7 +124,7 @@ namespace JobsSystem.Galaxy
         
         
         [BurstCompile]
-        public struct MoveJob : IJobParallelForTransform
+        private struct MoveJob : IJobParallelForTransform
         {
             public NativeArray<Vector3> Positions;
             public NativeArray<Vector3> Velocities;
@@ -129,6 +141,19 @@ namespace JobsSystem.Galaxy
                 Positions[index] = transform.position;
                 Velocities[index] = velocity;
                 Accelerations[index] = Vector3.zero;
+            }
+        }
+
+
+        [BurstCompile]
+        private struct RotateJob : IJobParallelForTransform
+        {
+            public NativeArray<int> Angles;
+
+            public void Execute(int index, TransformAccess transform)
+            {
+                transform.rotation = Quaternion.AngleAxis(Angles[index], Vector3.up);
+                Angles[index] = Angles[index] == 180 ? 0 : Angles[index] + 1;
             }
         }
 
