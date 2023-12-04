@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Assertions;
+﻿using UnityEngine;
 
 using Unity.Collections;
 using Unity.Networking.Transport;
@@ -16,25 +13,15 @@ namespace NetworkingChat
         private NetworkDriver driver;
 
         private NativeList<NetworkConnection> connections;
-
-        // private const int MAX_CONNECTIONS = 10;
-        //
-        // private List<int> connectionIDs = new List<int>();
-        //
-        // private int port = 5805;
-        //
-        // private int hostID;
-        // private int reliableChannel;
-        //
-        // private bool isStarted;
-        // private byte error;
-
-
-        private void Start() {}
+        
+        
+        private bool isStarted;
 
 
         private void Update()
         {
+            if (!isStarted) return;
+            
             driver.ScheduleUpdate().Complete();
             
             // Clean up connections
@@ -52,7 +39,8 @@ namespace NetworkingChat
             while ((networkConnection = driver.Accept()) != default)
             {
                 connections.Add(networkConnection);
-                Debug.Log("Accepted a connection");
+                Debug.Log($"Accepted a connection {networkConnection}");
+                SendMessageToAll($"Player {networkConnection} has connected");
             }
 
             
@@ -67,16 +55,13 @@ namespace NetworkingChat
                     {
                         case NetworkEvent.Type.Data:
                             var inMessage = streamReader.ReadFixedString512();
-                            Debug.Log($"From Client: Got {inMessage} from a client");
-                            // number += 2;
-
-                            driver.BeginSend(NetworkPipeline.Null, connections[i], out var writer);
-                            writer.WriteFixedString512($"Server: Message from client [{inMessage}] Received");
-                            driver.EndSend(writer);
+                            Debug.Log($"Client {connections[i]}. Message: {inMessage}");
+                            SendMessageToAll($"PLayer {connections[i]}: {inMessage}");
                             break;
 
                         case NetworkEvent.Type.Disconnect:
                             Debug.Log("Client Disconnected from Server");
+                            SendMessageToAll($"Player {connections[i]} has disconnected");
                             connections[i] = default;
                             break;
                     }
@@ -97,6 +82,9 @@ namespace NetworkingChat
                 driver.Listen();
 
             connections = new NativeList<NetworkConnection>(16, Allocator.Persistent);
+
+            isStarted = true;
+            Debug.Log("Server Started");
         }
 
 
@@ -106,7 +94,9 @@ namespace NetworkingChat
             {
                 driver.Dispose();
                 connections.Dispose();
+                isStarted = false;
             }
+            Debug.Log("Server Stopped");
         }
 
 

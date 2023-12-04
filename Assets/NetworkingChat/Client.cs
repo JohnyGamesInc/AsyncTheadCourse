@@ -14,19 +14,16 @@ namespace NetworkingChat
 
         private NetworkDriver driver;
         private NetworkConnection connection;
-        
-        
-        private void Start()
-        {
-            
-        }
+
+        private bool isStarted;
 
         
         private void Update()
         {
-            driver.ScheduleUpdate().Complete();
             
             if(!connection.IsCreated) return;
+            
+            driver.ScheduleUpdate().Complete();
 
             DataStreamReader streamReader;
             NetworkEvent.Type cmd;
@@ -46,7 +43,7 @@ namespace NetworkingChat
                     case NetworkEvent.Type.Data:
                         var inMessage = streamReader.ReadFixedString512();
                         Debug.Log($"From Server: [{inMessage}]");
-                        
+                        OnMessageReceive(inMessage);
                         break;
                     
                     case NetworkEvent.Type.Disconnect:
@@ -66,6 +63,11 @@ namespace NetworkingChat
 
             var endpoint = NetworkEndpoint.LoopbackIpv4.WithPort(9000);
             connection = driver.Connect(endpoint);
+
+            if (connection.IsCreated)
+            {
+                isStarted = true;
+            }
         }
 
 
@@ -75,6 +77,7 @@ namespace NetworkingChat
             {
                 connection.Disconnect(driver);
                 connection = default;
+                isStarted = false;
             }
         }
 

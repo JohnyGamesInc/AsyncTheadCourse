@@ -26,8 +26,8 @@ namespace NetworkingChat
         public void ReceiveMessage(object message)
         {
             messages.Add(message.ToString());
-            float value = (messages.Count - 1) * scrollbar.value;
-            scrollbar.value = Mathf.Clamp(value, 0, 1); // Here is something strange.
+            // float value = (messages.Count - 1) * scrollbar.value;
+            // scrollbar.value = Mathf.Clamp(value, 0, 1); // Here is something strange.
             UpdateText();
         }
 
@@ -35,8 +35,12 @@ namespace NetworkingChat
         private void UpdateText()
         {
             string text = "";
-            int index = (int) (messages.Count * scrollbar.value);
-            for (int i = index; i < messages.Count; i++)
+            // int index = (int) (messages.Count * scrollbar.value);
+            // for (int i = index; i < messages.Count; i++)
+            // {
+            //     text += messages[i] + "\n";
+            // }
+            for (int i = 0; i < messages.Count; i++)
             {
                 text += messages[i] + "\n";
             }
