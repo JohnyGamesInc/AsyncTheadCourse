@@ -28,7 +28,6 @@ namespace MultiplayerNetcode
             playerCharacter = Instantiate(playerPrefab);
             
             // NetworkServer.SpawnWithClientAuthority(playerCharacter, connectionToClient);
-            // NetworkConfig.Prefabs.NetworkPrefabsLists
         }
         
         
