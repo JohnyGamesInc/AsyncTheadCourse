@@ -11,10 +11,10 @@ namespace MultiplayerNetcode
     {
 
         public Action OnUpdateAction { get; protected set; }
+        
         public abstract FireAction FireAction { get; protected set; }
 
-        // [SyncVar]
-        protected Vector3 serverPosition;
+        protected NetworkVariable<Vector3> serverPosition = new();
 
         
         protected virtual void Initiate()
@@ -29,10 +29,10 @@ namespace MultiplayerNetcode
         }
 
         
-        // [Command]
-        protected void CmdUpdatePosition(Vector3 position)
+        [ServerRpc]
+        protected void UpdatePositionServerRpc(Vector3 position)
         {
-            serverPosition = position;
+            serverPosition.Value = position;
         }
 
 

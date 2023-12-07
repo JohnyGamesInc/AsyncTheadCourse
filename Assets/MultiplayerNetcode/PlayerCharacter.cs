@@ -64,12 +64,12 @@ namespace MultiplayerNetcode
         public override void Movement()
         {
             if (mouseLook != null && mouseLook.PlayerCamera != null)
-                // mouseLook.PlayerCamera.enabled = IsOwner;
+                mouseLook.PlayerCamera.enabled = IsOwner;
 
-            // if (IsOwner)
+            if (IsOwner)
             {
-                var moveX = Input.GetAxis("Horizontal") * movingSpeed;
-                var moveZ = Input.GetAxis("Vertical") * movingSpeed;
+                var moveX = Input.GetAxis("Horizontal") * movingSpeed * Time.deltaTime;
+                var moveZ = Input.GetAxis("Vertical") * movingSpeed * Time.deltaTime;
                 var movement = new Vector3(moveX, 0, moveZ);
                 movement = Vector3.ClampMagnitude(movement, movingSpeed);
 
@@ -84,13 +84,13 @@ namespace MultiplayerNetcode
                 characterController.Move(movement);
                 mouseLook.Rotation();
                 
-                CmdUpdatePosition(transform.position);
+                UpdatePositionServerRpc(transform.position);
             }
             else
             {
                 transform.position = Vector3.SmoothDamp(
                     transform.position, 
-                    serverPosition, 
+                    serverPosition.Value, 
                     ref currentVelocity,
                     movingSpeed * Time.deltaTime);
             }
