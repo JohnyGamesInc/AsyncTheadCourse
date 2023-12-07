@@ -26,7 +26,6 @@ namespace MultiplayerNetcode
             if (!IsServer) return;
 
             playerCharacter = Instantiate(playerPrefab);
-            
             // NetworkServer.SpawnWithClientAuthority(playerCharacter, connectionToClient);
         }
         
