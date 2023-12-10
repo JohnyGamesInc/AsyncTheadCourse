@@ -156,7 +156,7 @@ MonoBehaviour:
   numberOfEntities: 100
   startDistance: 100
   startVelocity: 1
-  startMass: 1000
+  startMass: 10
   gravitationModifier: 0.01
 --- !u!4 &48947136
 Transform:
