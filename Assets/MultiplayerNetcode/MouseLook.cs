@@ -18,17 +18,20 @@ namespace MultiplayerNetcode
         [Range(0.0f, 90.0f)]
         [SerializeField] private float maxVert = 45.0f;
         
-        private Camera camera;
+        private Camera _camera;
 
         private float rotationX = 0.0f;
         private float rotationY = 0.0f;
         
-        public Camera PlayerCamera => camera;
+        public Camera PlayerCamera => _camera;
+
+
+        private NetworkVariable<Quaternion> serverRotation = new();
 
 
         private void Start()
         {
-            camera = GetComponentInChildren<Camera>();
+            _camera = GetComponentInChildren<Camera>();
             var rb = GetComponentInChildren<Rigidbody>();
             if (rb != null) rb.freezeRotation = true;
         }
@@ -40,7 +43,16 @@ namespace MultiplayerNetcode
             rotationY += Input.GetAxis("Mouse X") * sensativity;
             rotationX = Mathf.Clamp(rotationX, minVert, maxVert);
             transform.rotation = Quaternion.Euler(0, rotationY, 0);
-            camera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            _camera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            
+            UpdateRotationServerRpc(transform.rotation);
+        }
+        
+        
+        [ServerRpc]
+        protected void UpdateRotationServerRpc(Quaternion rotation)
+        {
+            serverRotation.Value = rotation;
         }
         
         

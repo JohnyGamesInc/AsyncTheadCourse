@@ -22,8 +22,7 @@ namespace MultiplayerNetcode
 
         public string BulletCount => bulletCount;
 
-
-        //virtual? Oo
+        
         protected virtual void Start()
         {
             for (int i = 0; i < startAmmunition; i++)
