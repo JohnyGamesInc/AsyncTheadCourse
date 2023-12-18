@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/CodeMonkeyMultiplayer.unity
+    guid: 5832f51f853eff1449104b3e2c8ebac6
   m_configObjects: {}
